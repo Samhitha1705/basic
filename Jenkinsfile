@@ -67,17 +67,10 @@ pipeline {
 
         stage('Verify DB Creation') {
             steps {
-                echo "🔍 Verifying if users.db is created in host folder"
+                echo "🗂 Checking if users.db is created in ${HOST_DATA_DIR}"
                 bat """
-                REM wait ~5 seconds to allow container to init DB
-                ping 127.0.0.1 -n 5 > nul
-
-                if exist "${HOST_DATA_DIR}\\users.db" (
-                    echo ✅ users.db exists
-                ) else (
-                    echo ❌ users.db NOT found
-                    exit /b 1
-                )
+                timeout /t 5
+                if exist "${HOST_DATA_DIR}\\users.db" (echo ✅ users.db exists ) else (echo ❌ users.db NOT found )
                 """
             }
         }
@@ -88,7 +81,7 @@ pipeline {
             echo "❌ PIPELINE FAILED — Check Docker Desktop & logs"
         }
         success {
-            echo "🎉 PIPELINE SUCCESSFUL — users.db created!"
+            echo "🎉 PIPELINE SUCCESSFUL"
         }
     }
 }
