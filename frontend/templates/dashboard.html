@@ -1,77 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #4a90e2;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        main {
-            max-width: 600px;
-            margin: 50px auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        h1 {
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 18px;
-            margin-bottom: 30px;
-        }
-        a.button {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: #e94e77;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        a.button:hover {
-            background-color: #d63b63;
-        }
-        .flash {
-            margin-bottom: 20px;
-            padding: 12px;
-            border-radius: 5px;
-            color: white;
-        }
-        .flash-success { background-color: #4CAF50; }
-        .flash-danger { background-color: #f44336; }
-        .flash-warning { background-color: #ff9800; }
-        .flash-info { background-color: #2196F3; }
-    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to Your Dashboard</h1>
-    </header>
-    <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash flash-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
 
-        <p>Hello, <strong>{{ username }}</strong>! You are successfully logged in.</p>
-        <a href="{{ url_for('logout') }}" class="button">Logout</a>
-    </main>
+<h2>User Dashboard</h2>
+<a href="/logout">Logout</a>
+<br><br>
+
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>Last Login</th>
+    <th>Login Count</th>
+</tr>
+
+{% for u in users %}
+<tr>
+    <td>{{ u[0] }}</td>
+    <td>{{ u[1] }}</td>
+    <td>{{ u[2] }}</td>
+    <td>{{ u[3] }}</td>
+</tr>
+{% endfor %}
+</table>
+
 </body>
 </html>
