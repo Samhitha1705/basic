@@ -2,11 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import sqlite3
 import os
 
-app = Flask(__name__)
+# Flask app
+app = Flask(
+    __name__,
+    template_folder=os.path.join(os.getcwd(), "frontend", "templates")  # Correct template path
+)
 app.secret_key = "supersecret"
 
-DB_FILE = "data/users.db"
-os.makedirs("data", exist_ok=True)
+# Database file path
+DB_FILE = os.path.join(os.getcwd(), "data", "users.db")
+os.makedirs(os.path.dirname(DB_FILE), exist_ok=True)
 
 # Initialize database
 def init_db():
@@ -83,4 +88,4 @@ def logout():
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5002)
+    app.run(host="0.0.0.0", port=5002, debug=True)
