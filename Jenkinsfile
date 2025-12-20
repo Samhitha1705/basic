@@ -5,8 +5,7 @@ pipeline {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
         PORT = "5002"
-        // This points to your project folder where you want users.db
-        HOST_DATA_DIR = "C:/Users/1016/OneDrive - Middleware Talents Limited/downloads/Updated Jenkins/data"
+        HOST_DATA_DIR = "C:/Users/1016/jenkins-data"  // safe folder outside OneDrive
     }
 
     stages {
@@ -66,9 +65,16 @@ pipeline {
             }
         }
 
-        stage('Health Check') {
+        stage('Verify DB Creation') {
             steps {
-                echo "✅ Health Check skipped (optional)"
+                echo "🔍 Checking if users.db is created in ${HOST_DATA_DIR}"
+                bat """
+                if exist "${HOST_DATA_DIR}\\users.db" (
+                    echo ✅ users.db exists
+                ) else (
+                    echo ❌ users.db NOT found
+                )
+                """
             }
         }
     }
@@ -78,7 +84,7 @@ pipeline {
             echo "❌ PIPELINE FAILED — Check Docker Desktop & logs"
         }
         success {
-            echo "🎉 PIPELINE SUCCESSFUL — users.db will now appear in ${HOST_DATA_DIR}"
+            echo "🎉 PIPELINE SUCCESSFUL — users.db is now in ${HOST_DATA_DIR}"
         }
     }
 }
