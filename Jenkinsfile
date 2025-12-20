@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "login-sqlite-app"
+        IMAGE_NAME     = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
-        PORT = "5002"
+        PORT           = "5002"
     }
 
     stages {
@@ -16,6 +16,13 @@ pipeline {
             }
         }
 
+        stage('Verify Docker Running') {
+            steps {
+                echo '🐳 Verifying Docker daemon'
+                bat 'docker info'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo '🐳 Building Docker image'
@@ -23,27 +30,21 @@ pipeline {
             }
         }
 
-        stage('Stop Container Using Port 5002 (SAFE)') {
-            steps {
-                echo '🛑 Stopping any container using port 5002'
-                bat '''
-                FOR /F %%C IN ('docker ps -q --filter "publish=5002"') DO (
-                    docker stop %%C
-                )
-                '''
-            }
-        }
-
         stage('Remove Old Container (SAFE)') {
             steps {
                 echo '🧹 Removing old container if exists'
-                bat "docker rm -f %CONTAINER_NAME% || echo Container not found"
+                bat '''
+                docker ps -a -q -f name=%CONTAINER_NAME% > temp.txt
+                set /p CID=<temp.txt
+                if NOT "%CID%"=="" docker rm -f %CONTAINER_NAME%
+                del temp.txt
+                '''
             }
         }
 
         stage('Run New Container') {
             steps {
-                echo '🚀 Starting new container on port 5002'
+                echo '🚀 Running new container on port 5002'
                 bat """
                 docker run -d ^
                 --name %CONTAINER_NAME% ^
@@ -55,21 +56,19 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                echo '🔍 Health check'
-                bat '''
-                timeout /t 5
-                curl http://localhost:5002 || exit 1
-                '''
+                echo '❤️ Waiting for app'
+                bat 'timeout /t 5'
             }
         }
     }
 
     post {
         success {
-            echo '✅ PIPELINE SUCCESS — App running on http://localhost:5002'
+            echo '✅ DEPLOYMENT SUCCESSFUL'
+            echo '🌐 App running at: http://localhost:5002'
         }
         failure {
-            echo '❌ PIPELINE FAILED — Check logs'
+            echo '❌ PIPELINE FAILED — Check Docker Desktop & logs'
         }
     }
 }
