@@ -2,30 +2,82 @@
 <html>
 <head>
     <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #1f4e79;
+        }
+        a.logout {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: white;
+            background: #f44336;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+        a.logout:hover {
+            background: #d32f2f;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #1f4e79;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #dbe7f7;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h2>User Dashboard</h2>
+        <a class="logout" href="/logout">Logout</a>
 
-<h2>User Dashboard</h2>
-<a href="/logout">Logout</a>
-<br><br>
-
-<table border="1">
-<tr>
-    <th>ID</th>
-    <th>Username</th>
-    <th>Last Login</th>
-    <th>Login Count</th>
-</tr>
-
-{% for u in users %}
-<tr>
-    <td>{{ u[0] }}</td>
-    <td>{{ u[1] }}</td>
-    <td>{{ u[2] }}</td>
-    <td>{{ u[3] }}</td>
-</tr>
-{% endfor %}
-</table>
-
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Last Login</th>
+                <th>Login Count</th>
+            </tr>
+            {% for u in users %}
+            <tr>
+                <td>{{ u[0] }}</td>
+                <td>{{ u[1] }}</td>
+                <td>{{ u[2] }}</td>
+                <td>{{ u[3] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </body>
 </html>

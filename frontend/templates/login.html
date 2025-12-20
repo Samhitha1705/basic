@@ -2,24 +2,72 @@
 <html>
 <head>
     <title>Login / Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #e0f2f1;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #00796b;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 12px;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #004d40;
+        }
+        hr {
+            margin: 25px 0;
+            border: 0;
+            border-top: 1px solid #ccc;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h2>Register</h2>
+        <form method="POST" action="/register">
+            <input name="username" required placeholder="Username">
+            <input name="password" type="password" required placeholder="Password">
+            <button type="submit">Register</button>
+        </form>
 
-<h2>Register</h2>
-<form method="POST" action="/register">
-    <input name="username" required placeholder="Username"><br><br>
-    <input name="password" type="password" required placeholder="Password"><br><br>
-    <button type="submit">Register</button>
-</form>
+        <hr>
 
-<hr>
-
-<h2>Login</h2>
-<form method="POST" action="/login">
-    <input name="username" required placeholder="Username"><br><br>
-    <input name="password" type="password" required placeholder="Password"><br><br>
-    <button type="submit">Login</button>
-</form>
-
+        <h2>Login</h2>
+        <form method="POST" action="/login">
+            <input name="username" required placeholder="Username">
+            <input name="password" type="password" required placeholder="Password">
+            <button type="submit">Login</button>
+        </form>
+    </div>
 </body>
 </html>
