@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
         PORT = "5002"
-        HOST_DATA_DIR = "C:/ProgramData/Jenkins/.jenkins/workspace/updated jenkins/data"
+        HOST_DATA_DIR = "C:/ProgramData/Jenkins/.jenkins/workspace/updated_jenkins/data"
     }
 
     stages {
@@ -67,7 +67,7 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                echo "✅ Health Check skipped for now (optional)"
+                echo "✅ Health Check skipped (optional)"
             }
         }
     }
@@ -77,7 +77,7 @@ pipeline {
             echo "❌ PIPELINE FAILED — Check Docker Desktop & logs"
         }
         success {
-            echo "🎉 PIPELINE SUCCESSFUL"
+            echo "🎉 PIPELINE SUCCESSFUL — users.db should now persist in ${HOST_DATA_DIR}"
         }
     }
 }
