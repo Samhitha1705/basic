@@ -23,20 +23,20 @@ pipeline {
             }
         }
 
-        stage('Free Port 5002 (Windows)') {
+        stage('Stop Container Using Port 5002 (SAFE)') {
             steps {
-                echo '🧹 Freeing port 5002 if already in use'
+                echo '🛑 Stopping any container using port 5002'
                 bat '''
-                FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr :5002') DO (
-                    taskkill /PID %%P /F
+                FOR /F %%C IN ('docker ps -q --filter "publish=5002"') DO (
+                    docker stop %%C
                 )
                 '''
             }
         }
 
-        stage('Remove Old Container (Safe)') {
+        stage('Remove Old Container (SAFE)') {
             steps {
-                echo '🧽 Removing old container if exists'
+                echo '🧹 Removing old container if exists'
                 bat "docker rm -f %CONTAINER_NAME% || echo Container not found"
             }
         }
@@ -55,7 +55,7 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                echo '🔍 Checking application health'
+                echo '🔍 Health check'
                 bat '''
                 timeout /t 5
                 curl http://localhost:5002 || exit 1
@@ -66,10 +66,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ PIPELINE SUCCESS — Application running on http://localhost:5002'
+            echo '✅ PIPELINE SUCCESS — App running on http://localhost:5002'
         }
         failure {
-            echo '❌ PIPELINE FAILED — Check logs above'
+            echo '❌ PIPELINE FAILED — Check logs'
         }
     }
 }
