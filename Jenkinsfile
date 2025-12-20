@@ -4,7 +4,8 @@ pipeline {
     environment {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-container"
-        APP_PORT = "5002"  // container & host port
+        APP_PORT = "5002"
+        HOST_DATA_DIR = "C:\\Users\\1016\\OneDrive - Middleware Talents Limited\\downloads\\Updated Jenkins\\data"
     }
 
     stages {
@@ -36,8 +37,8 @@ pipeline {
 
         stage('Run New Container') {
             steps {
-                echo "🏃 Running new container on port 5002"
-                bat "docker run -d --name ${CONTAINER_NAME} -p 5002:5002 ${IMAGE_NAME}"
+                echo "🏃 Running new container on port ${APP_PORT} with persistent data"
+                bat "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:${APP_PORT} -v \"${HOST_DATA_DIR}:/app/data\" ${IMAGE_NAME}"
             }
         }
 
