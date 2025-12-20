@@ -5,7 +5,8 @@ pipeline {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
         PORT = "5002"
-        HOST_DATA_DIR = "C:/ProgramData/Jenkins/.jenkins/workspace/updated_jenkins/data"
+        // This points to your project folder where you want users.db
+        HOST_DATA_DIR = "C:/Users/1016/OneDrive - Middleware Talents Limited/downloads/Updated Jenkins/data"
     }
 
     stages {
@@ -77,7 +78,7 @@ pipeline {
             echo "❌ PIPELINE FAILED — Check Docker Desktop & logs"
         }
         success {
-            echo "🎉 PIPELINE SUCCESSFUL — users.db should now persist in ${HOST_DATA_DIR}"
+            echo "🎉 PIPELINE SUCCESSFUL — users.db will now appear in ${HOST_DATA_DIR}"
         }
     }
 }
