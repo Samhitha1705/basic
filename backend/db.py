@@ -2,10 +2,9 @@ import sqlite3
 import os
 from datetime import datetime
 
-# Always use /app/data inside Docker
+# Always use container path (host folder mounted here)
 DB_DIR = "/app/data"
 os.makedirs(DB_DIR, exist_ok=True)
-
 DB_PATH = os.path.join(DB_DIR, "users.db")
 
 
@@ -14,7 +13,6 @@ def get_connection():
 
 
 def init_db():
-    """Initialize the database immediately on container start."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""

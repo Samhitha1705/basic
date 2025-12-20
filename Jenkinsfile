@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
         PORT = "5002"
-        HOST_DATA_DIR = "C:/Users/1016/DOWNLO~1/data"  // short path to avoid spaces
+        HOST_DATA_DIR = "C:/Users/1016/Downloads/Updated Jenkins/data"
     }
 
     stages {
@@ -67,13 +67,16 @@ pipeline {
 
         stage('Verify DB Creation') {
             steps {
-                echo "🔍 Checking if users.db is created in ${HOST_DATA_DIR}"
+                echo "🔍 Verifying if users.db is created in host folder"
                 bat """
-                timeout /t 5 >nul
+                REM wait ~5 seconds to allow container to init DB
+                ping 127.0.0.1 -n 5 > nul
+
                 if exist "${HOST_DATA_DIR}\\users.db" (
                     echo ✅ users.db exists
                 ) else (
                     echo ❌ users.db NOT found
+                    exit /b 1
                 )
                 """
             }
@@ -85,7 +88,7 @@ pipeline {
             echo "❌ PIPELINE FAILED — Check Docker Desktop & logs"
         }
         success {
-            echo "🎉 PIPELINE SUCCESSFUL — users.db is now in ${HOST_DATA_DIR}"
+            echo "🎉 PIPELINE SUCCESSFUL — users.db created!"
         }
     }
 }
