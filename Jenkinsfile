@@ -5,8 +5,7 @@ pipeline {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
         PORT = "5002"
-        DATA_DIR = "data"
-        DB_FILE = "users.db"
+        HOST_DATA_DIR = "C:/ProgramData/Jenkins/.jenkins/workspace/updated jenkins/data"
     }
 
     stages {
@@ -20,17 +19,16 @@ pipeline {
 
         stage('Verify Docker Running') {
             steps {
-                echo "🐳 Verifying Docker daemon"
-                bat "docker info"
+                echo "🛠 Verifying Docker daemon"
+                bat 'docker info'
             }
         }
 
         stage('Prepare Data Folder') {
             steps {
-                echo "🗂 Ensuring data folder exists"
+                echo "📂 Ensuring data folder exists"
                 bat """
-                if not exist ${DATA_DIR} mkdir ${DATA_DIR}
-                if not exist ${DATA_DIR}\\${DB_FILE} type nul 1> ${DATA_DIR}\\${DB_FILE}
+                if not exist "${HOST_DATA_DIR}" mkdir "${HOST_DATA_DIR}"
                 """
             }
         }
@@ -61,7 +59,7 @@ pipeline {
                 docker run -d ^
                     --name ${CONTAINER_NAME} ^
                     -p ${PORT}:${PORT} ^
-                    -v %CD%\\${DATA_DIR}:/app/data ^
+                    -v "${HOST_DATA_DIR}:/app/data" ^
                     ${IMAGE_NAME}
                 """
             }
@@ -69,9 +67,7 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                echo "❤️ Waiting for app to start"
-                // Windows-safe wait
-                bat "ping 127.0.0.1 -n 6 > nul"
+                echo "✅ Health Check skipped for now (optional)"
             }
         }
     }
@@ -79,6 +75,9 @@ pipeline {
     post {
         failure {
             echo "❌ PIPELINE FAILED — Check Docker Desktop & logs"
+        }
+        success {
+            echo "🎉 PIPELINE SUCCESSFUL"
         }
     }
 }
