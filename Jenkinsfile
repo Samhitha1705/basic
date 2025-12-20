@@ -4,12 +4,10 @@ pipeline {
     environment {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
-        PORT = "5002"
         HOST_DATA_DIR = "C:/Users/1016/Downloads/Updated Jenkins/data"
     }
 
     stages {
-
         stage('Checkout SCM') {
             steps {
                 echo "📦 Checking out source code"
@@ -26,16 +24,14 @@ pipeline {
 
         stage('Prepare Data Folder') {
             steps {
-                echo "📂 Ensuring data folder exists"
-                bat """
-                if not exist "${HOST_DATA_DIR}" mkdir "${HOST_DATA_DIR}"
-                """
+                echo "🗂 Ensuring data folder exists"
+                bat "if not exist \"${HOST_DATA_DIR}\" mkdir \"${HOST_DATA_DIR}\""
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo "🐳 Building Docker image"
+                echo "📦 Building Docker image"
                 bat "docker build -t ${IMAGE_NAME} ."
             }
         }
@@ -54,11 +50,11 @@ pipeline {
 
         stage('Run New Container') {
             steps {
-                echo "🚀 Running new container on port ${PORT}"
+                echo "🚀 Running new container on port 5002"
                 bat """
                 docker run -d ^
                     --name ${CONTAINER_NAME} ^
-                    -p ${PORT}:${PORT} ^
+                    -p 5002:5002 ^
                     -v "${HOST_DATA_DIR}:/app/data" ^
                     ${IMAGE_NAME}
                 """
@@ -69,19 +65,17 @@ pipeline {
             steps {
                 echo "🗂 Checking if users.db is created in ${HOST_DATA_DIR}"
                 bat """
-                timeout /t 5
-                if exist "${HOST_DATA_DIR}\\users.db" (echo ✅ users.db exists ) else (echo ❌ users.db NOT found )
+                REM Wait 5 seconds without input redirection
+                ping 127.0.0.1 -n 6 >nul
+                if exist "${HOST_DATA_DIR}\\users.db" (echo ✅ users.db exists) else (echo ❌ users.db NOT found)
                 """
             }
         }
     }
 
     post {
-        failure {
-            echo "❌ PIPELINE FAILED — Check Docker Desktop & logs"
-        }
-        success {
-            echo "🎉 PIPELINE SUCCESSFUL"
+        always {
+            echo "🏁 PIPELINE COMPLETE — Check Docker Desktop & logs"
         }
     }
 }
