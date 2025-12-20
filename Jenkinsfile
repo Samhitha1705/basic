@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                echo "📖 Checking out source code from Git"
+                echo "📦 Checking out source code from Git"
                 checkout scm
             }
         }
@@ -26,24 +26,33 @@ pipeline {
         stage('Stop & Remove Old Container') {
             steps {
                 echo "🛑 Stopping old container if exists"
-                bat """
-                docker stop ${CONTAINER_NAME} || echo 'No container running'
-                docker rm ${CONTAINER_NAME} || echo 'No container to remove'
-                """
+                script {
+                    // Stop old container safely
+                    def stopResult = bat(script: "docker stop ${CONTAINER_NAME}", returnStatus: true)
+                    echo "docker stop exit code: ${stopResult}"
+
+                    // Remove old container safely
+                    def rmResult = bat(script: "docker rm ${CONTAINER_NAME}", returnStatus: true)
+                    echo "docker rm exit code: ${rmResult}"
+                }
             }
         }
 
         stage('Run New Container') {
             steps {
                 echo "▶️ Running new container"
-                bat "docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${CONTAINER_PORT} ${IMAGE_NAME}"
+                bat """
+                    docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${CONTAINER_PORT} ${IMAGE_NAME}
+                """
             }
         }
 
         stage('Health Check') {
             steps {
                 echo "🔍 Checking if container is running"
-                bat "docker ps -a | findstr ${CONTAINER_NAME}"
+                bat """
+                    docker ps | findstr ${CONTAINER_NAME}
+                """
             }
         }
     }
@@ -53,7 +62,7 @@ pipeline {
             echo "✅ Pipeline completed successfully!"
         }
         failure {
-            echo "❌ Pipeline FAILED!"
+            echo "❌ Pipeline failed. Check logs above."
         }
     }
 }
