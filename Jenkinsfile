@@ -6,7 +6,7 @@ pipeline {
         CONTAINER_NAME = "fullstack_sqlite_app"
         APP_PORT       = "5002"
     }
-
+///////
     stages {
 
         stage("Checkout Code") {
