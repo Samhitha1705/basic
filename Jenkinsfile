@@ -56,8 +56,25 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                echo '❤️ Waiting for app'
-                bat 'timeout /t 5'
+                echo '❤️ Checking if app is up'
+                script {
+                    def retries = 5
+                    def success = false
+                    for (int i = 0; i < retries; i++) {
+                        try {
+                            bat "powershell -Command \"Invoke-WebRequest -Uri http://localhost:%PORT% -UseBasicParsing -TimeoutSec 5\""
+                            echo "✅ App is running!"
+                            success = true
+                            break
+                        } catch (err) {
+                            echo "⚠️ App not ready yet, retrying... (${i+1}/${retries})"
+                            bat "timeout /t 3"
+                        }
+                    }
+                    if (!success) {
+                        error "❌ Health check failed: App did not respond on port %PORT%"
+                    }
+                }
             }
         }
     }
