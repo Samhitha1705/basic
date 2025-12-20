@@ -3,13 +3,13 @@ pipeline {
 
     environment {
         IMAGE_NAME = "login-sqlite-app"
-        CONTAINER_NAME = "login-sqlite-container-new" // no v2, just new
+        CONTAINER_NAME = "login-sqlite-container-new"
         HOST_PORT = "5002"
         CONTAINER_PORT = "5000"
     }
 
     stages {
-        stage('Declarative: Checkout SCM') {
+        stage('Checkout SCM') {
             steps {
                 checkout([
                     $class: 'GitSCM',
@@ -24,12 +24,6 @@ pipeline {
             }
         }
 
-        stage('Checkout Code') {
-            steps {
-                echo '📌 Checking out source code'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 echo '🚀 Building Docker image'
@@ -37,17 +31,21 @@ pipeline {
             }
         }
 
-        stage('Stop & Remove Old Container (new only)') {
+        stage('Stop & Remove Old Container') {
             steps {
                 echo '🧹 Cleaning old container if exists'
-                bat "docker stop ${CONTAINER_NAME} || echo Not running"
-                bat "docker rm ${CONTAINER_NAME} || echo Not present"
+                // Ignore errors if container does not exist
+                bat """
+                docker stop ${CONTAINER_NAME} || echo Not running
+                docker rm ${CONTAINER_NAME} || echo Not present
+                """
             }
         }
 
         stage('Run New Container') {
             steps {
                 echo '🏃 Running new container'
+                // Use double quotes and separate commands
                 bat "docker run -d -p ${HOST_PORT}:${CONTAINER_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}"
             }
         }
