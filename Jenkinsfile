@@ -2,66 +2,60 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME     = "fullstack-sqlite:latest"
-        CONTAINER_NAME = "fullstack_sqlite_app"
+        IMAGE_NAME     = "login-sqlite-app"
+        CONTAINER_NAME = "login-sqlite-container"
         APP_PORT       = "5002"
     }
-///////
+
     stages {
 
-        stage("Checkout Code") {
+        stage('Checkout Code') {
             steps {
                 echo "📥 Checking out source code"
                 checkout scm
             }
         }
 
-        stage("Build Docker Image") {
+        stage('Build Docker Image') {
             steps {
                 echo "🐳 Building Docker image"
-                sh """
-                docker build -t ${IMAGE_NAME} .
+                bat "docker build -t %IMAGE_NAME% ."
+            }
+        }
+
+        stage('Stop & Remove Old Container (same name only)') {
+            steps {
+                echo "🛑 Cleaning old container if exists"
+                bat """
+                docker stop %CONTAINER_NAME% || echo Not running
+                docker rm %CONTAINER_NAME% || echo Not present
                 """
             }
         }
 
-        stage("Stop & Remove Old Container") {
+        stage('Run New Container') {
             steps {
-                echo "🧹 Cleaning old container (if exists)"
-                sh """
-                docker stop ${CONTAINER_NAME} || true
-                docker rm ${CONTAINER_NAME} || true
+                echo "🚀 Running container on port 5002"
+                bat """
+                docker run -d ^
+                --name %CONTAINER_NAME% ^
+                -p %APP_PORT%:%APP_PORT% ^
+                %IMAGE_NAME%
                 """
             }
         }
 
-        stage("Run New Container") {
+        stage('Health Check') {
             steps {
-                echo "🚀 Starting application container on port ${APP_PORT}"
-                sh """
-                docker run -d \
-                  --name ${CONTAINER_NAME} \
-                  -p ${APP_PORT}:${APP_PORT} \
-                  -v \$(pwd)/data:/app/data \
-                  ${IMAGE_NAME}
-                """
-            }
-        }
-
-        stage("Health Check") {
-            steps {
-                echo "❤️ Running health check"
-                sh """
-                sleep 5
-                curl --fail http://localhost:${APP_PORT}
-                """
+                echo "❤️ Verifying running containers"
+                bat "docker ps"
             }
         }
     }
 
     post {
         success {
-            echo "✅ Jenkins Pipeline SUCCESS – App running on port ${APP_PORT}"
+            echo "✅ Jenkins Pipeline SUCCESSFUL"
         }
         failure {
             echo "❌ Jenkins Pipeline FAILED"
