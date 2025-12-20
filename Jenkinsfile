@@ -11,36 +11,39 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                echo "📦 Checking out source code"
-                checkout([$class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/Samhitha1705/basic.git',
-                        credentialsId: 'github-fine-grained-pat'
-                    ]]
-                ])
+                echo '📦 Checking out source code'
+                checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo "🐳 Building Docker image"
+                echo '🐳 Building Docker image'
                 bat "docker build -t %IMAGE_NAME% ."
             }
         }
 
-        stage('Remove Old Container (SAFE)') {
+        stage('Free Port 5002 (Windows)') {
             steps {
-                echo "🧹 Removing old container if exists"
-                bat """
-                docker rm -f %CONTAINER_NAME% || echo Container not found
-                """
+                echo '🧹 Freeing port 5002 if already in use'
+                bat '''
+                FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr :5002') DO (
+                    taskkill /PID %%P /F
+                )
+                '''
+            }
+        }
+
+        stage('Remove Old Container (Safe)') {
+            steps {
+                echo '🧽 Removing old container if exists'
+                bat "docker rm -f %CONTAINER_NAME% || echo Container not found"
             }
         }
 
         stage('Run New Container') {
             steps {
-                echo "🚀 Starting new container on port 5002"
+                echo '🚀 Starting new container on port 5002'
                 bat """
                 docker run -d ^
                 --name %CONTAINER_NAME% ^
@@ -52,20 +55,21 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                echo "🔍 Checking app health"
-                sleep 5
-                bat "curl http://localhost:%PORT%"
+                echo '🔍 Checking application health'
+                bat '''
+                timeout /t 5
+                curl http://localhost:5002 || exit 1
+                '''
             }
         }
     }
 
     post {
         success {
-            echo "✅ DEPLOYMENT SUCCESSFUL!"
-            echo "🌐 App running at http://localhost:5002"
+            echo '✅ PIPELINE SUCCESS — Application running on http://localhost:5002'
         }
         failure {
-            echo "❌ PIPELINE FAILED"
+            echo '❌ PIPELINE FAILED — Check logs above'
         }
     }
 }
