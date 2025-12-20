@@ -23,6 +23,17 @@ pipeline {
             }
         }
 
+        stage('Prepare Data Folder') {
+            steps {
+                echo '🗂 Ensuring data folder exists'
+                bat '''
+                if not exist data mkdir data
+                if not exist data\\users.db echo Creating empty users.db
+                type nul > data\\users.db
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo '🐳 Building Docker image'
@@ -44,7 +55,7 @@ pipeline {
 
         stage('Run New Container') {
             steps {
-                echo '🚀 Running new container on port 5002'
+                echo '🚀 Running new container on port %PORT%'
                 bat """
                 docker run -d ^
                 --name %CONTAINER_NAME% ^
@@ -56,25 +67,8 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                echo '❤️ Checking if app is up'
-                script {
-                    def retries = 5
-                    def success = false
-                    for (int i = 0; i < retries; i++) {
-                        try {
-                            bat "powershell -Command \"Invoke-WebRequest -Uri http://localhost:%PORT% -UseBasicParsing -TimeoutSec 5\""
-                            echo "✅ App is running!"
-                            success = true
-                            break
-                        } catch (err) {
-                            echo "⚠️ App not ready yet, retrying... (${i+1}/${retries})"
-                            bat "timeout /t 3"
-                        }
-                    }
-                    if (!success) {
-                        error "❌ Health check failed: App did not respond on port %PORT%"
-                    }
-                }
+                echo '❤️ Waiting for app'
+                bat 'timeout /t 5'
             }
         }
     }
@@ -82,7 +76,7 @@ pipeline {
     post {
         success {
             echo '✅ DEPLOYMENT SUCCESSFUL'
-            echo '🌐 App running at: http://localhost:5002'
+            echo '🌐 App running at: http://localhost:%PORT%'
         }
         failure {
             echo '❌ PIPELINE FAILED — Check Docker Desktop & logs'

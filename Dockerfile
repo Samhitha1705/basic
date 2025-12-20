@@ -12,8 +12,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ backend/
 COPY frontend/templates/ frontend/templates/
 
-# Copy data folder
-COPY data/ data/
+# Ensure data folder exists inside container
+RUN mkdir -p /app/data
+
+# Optionally copy existing users.db if present (won't fail if missing)
+COPY data/users.db /app/data/ 2>/dev/null || echo "No existing users.db, will be created at runtime"
 
 # Expose Flask port
 EXPOSE 5002
