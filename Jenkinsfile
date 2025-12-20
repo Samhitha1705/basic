@@ -4,29 +4,28 @@ pipeline {
     environment {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-container"
-        HOST_DATA_DIR = "C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\updated jenkins\\data"
-        PORT = "5002"
     }
 
     stages {
         stage('Checkout SCM') {
             steps {
-                echo "🔄 Checking out source code from Git"
-                checkout([$class: 'GitSCM', 
-                          branches: [[name: '*/main']],
-                          doGenerateSubmoduleConfigurations: false,
-                          extensions: [],
-                          userRemoteConfigs: [[
-                              url: 'https://github.com/Samhitha1705/basic.git',
-                              credentialsId: 'github-fine-grained-pat'
-                          ]]
+                echo "🔍 Checking out source code from Git"
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/Samhitha1705/basic.git',
+                        credentialsId: 'github-fine-grained-pat'
+                    ]]
                 ])
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo "🛠 Building Docker image"
+                echo "🚀 Building Docker image"
                 bat "docker build -t ${IMAGE_NAME} ."
             }
         }
@@ -34,39 +33,37 @@ pipeline {
         stage('Stop & Remove Old Container') {
             steps {
                 echo "🧹 Cleaning old container if exists"
-                bat """
-                    docker stop ${CONTAINER_NAME} || echo Container not running
-                    docker rm ${CONTAINER_NAME} || echo Container not present
-                """
+                script {
+                    def stopStatus = bat(script: "docker stop ${CONTAINER_NAME}", returnStatus: true)
+                    if (stopStatus != 0) echo "Container not running, continuing..."
+
+                    def rmStatus = bat(script: "docker rm ${CONTAINER_NAME}", returnStatus: true)
+                    if (rmStatus != 0) echo "Container not present, continuing..."
+                }
             }
         }
 
         stage('Run New Container') {
             steps {
-                echo "🚀 Running new container"
+                echo "🏃 Running new container"
                 bat """
-                    docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${HOST_DATA_DIR}:/app/data ${IMAGE_NAME}
+                    docker run -d --name ${CONTAINER_NAME} -p 5000:5000 ${IMAGE_NAME}
                 """
             }
         }
 
         stage('Health Check') {
             steps {
-                echo "✅ Performing health check"
-                bat """
-                    REM Replace below with actual health check if needed
-                    docker ps | findstr ${CONTAINER_NAME}
-                """
+                echo "✅ Checking container health"
+                // Simple check: docker ps to see if container is running
+                bat "docker ps | findstr ${CONTAINER_NAME}"
             }
         }
     }
 
     post {
-        always {
-            echo "📌 Jenkins Pipeline completed"
-        }
         success {
-            echo "🎉 Pipeline succeeded!"
+            echo "🎉 Jenkins Pipeline completed successfully!"
         }
         failure {
             echo "❌ Pipeline FAILED!"
