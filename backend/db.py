@@ -10,12 +10,11 @@ DB_PATH = os.path.join(DB_DIR, "users.db")
 
 
 def get_connection():
-    """Return a SQLite connection to the database."""
     return sqlite3.connect(DB_PATH, check_same_thread=False)
 
 
 def init_db():
-    """Initialize the database and create users table if not exists."""
+    """Initialize the database immediately on container start."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -30,10 +29,10 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+    print(f"✅ users.db created at {DB_PATH}")
 
 
 def create_user(username, password):
-    """Insert a new user into the database."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -45,7 +44,6 @@ def create_user(username, password):
 
 
 def validate_user(username, password):
-    """Check if a user exists with the given credentials."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -58,7 +56,6 @@ def validate_user(username, password):
 
 
 def update_login(username):
-    """Update the last login time and increment login_count for a user."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -72,7 +69,6 @@ def update_login(username):
 
 
 def get_all_users():
-    """Return a list of all users with id, username, last_login, and login_count."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(

@@ -1,11 +1,11 @@
 pipeline {
     agent any
-//////////
+
     environment {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
         PORT = "5002"
-        HOST_DATA_DIR = "C:/Users/1016/jenkins-data"  // safe folder outside OneDrive
+        HOST_DATA_DIR = "C:/Users/1016/DOWNLO~1/data"  // short path to avoid spaces
     }
 
     stages {
@@ -69,6 +69,7 @@ pipeline {
             steps {
                 echo "🔍 Checking if users.db is created in ${HOST_DATA_DIR}"
                 bat """
+                timeout /t 5 >nul
                 if exist "${HOST_DATA_DIR}\\users.db" (
                     echo ✅ users.db exists
                 ) else (

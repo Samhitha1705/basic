@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, redirect, session
 from db import init_db, create_user, validate_user, update_login, get_all_users
 
-app = Flask(__name__, template_folder="../frontend/templates")
+app = Flask(__name__, template_folder="frontend/templates")  # fixed path
 app.secret_key = "supersecretkey"
 
+# Initialize database on container start
 init_db()
-
+print("✅ users.db initialized")
 
 @app.route("/")
 def home():
@@ -16,7 +17,6 @@ def home():
 def register():
     username = request.form["username"]
     password = request.form["password"]
-
     try:
         create_user(username, password)
         return redirect("/")
@@ -28,12 +28,10 @@ def register():
 def login():
     username = request.form["username"]
     password = request.form["password"]
-
     if validate_user(username, password):
         session["user"] = username
         update_login(username)
         return redirect("/dashboard")
-
     return "Invalid credentials"
 
 
