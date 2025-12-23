@@ -63,7 +63,7 @@ pipeline {
         stage('Docker compose run'){
             steps{
                 echo " Dcoker compose"
-                bat ' docker compose -f docker-compose.yml -d up'
+                bat ' docker-compose -f docker-compose.yml up -d'
             }
         }
 
