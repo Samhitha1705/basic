@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
-        //HOST_DATA_DIR = "C:/Users/1016/Downloads/Updated Jenkins/data"
+        // HOST_DATA_DIR = "C:/Users/1016/Downloads/Updated Jenkins/data"
     }
 
     stages {
@@ -22,12 +22,12 @@ pipeline {
             }
         }
 
-        stage('Prepare Data Folder') {
-            steps {
-                echo "🗂 Ensuring data folder exists"
-                bat "if not exist \"${HOST_DATA_DIR}\" mkdir \"${HOST_DATA_DIR}\""
-            }
-        }
+        // stage('Prepare Data Folder') {
+        //     steps {
+        //         echo "🗂 Ensuring data folder exists"
+        //         bat "if not exist \"${HOST_DATA_DIR}\" mkdir \"${HOST_DATA_DIR}\""
+        //     }
+        // }
 
         stage('Build Docker Image') {
             steps {
@@ -48,16 +48,22 @@ pipeline {
             }
         }
 
-        stage('Run New Container') {
-            steps {
-                echo "🚀 Running new container on port 5002"
-                bat """
-                docker run -d ^
-                    --name ${CONTAINER_NAME} ^
-                    -p 5002:5002 ^
-                    -v "${HOST_DATA_DIR}:/app/data" ^
-                    ${IMAGE_NAME}
-                """
+        // stage('Run New Container') {
+        //     steps {
+        //         echo "🚀 Running new container on port 5002"
+        //         bat """
+        //         docker run -d ^
+        //             --name ${CONTAINER_NAME} ^
+        //             -p 5002:5002 ^
+        //             -v "${HOST_DATA_DIR}:/app/data" ^
+        //             ${IMAGE_NAME}
+        //         """
+        //     }
+        // }
+        stage('Docker compose run'){
+            steps{
+                echo " Dcoker compose"
+                bat ' docker compose -f docker-compose.yml -d up'
             }
         }
 
