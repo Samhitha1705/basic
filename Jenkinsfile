@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
-        HOST_DATA_DIR = "C:/Users/1016/Downloads/Updated Jenkins/data"
+        //HOST_DATA_DIR = "C:/Users/1016/Downloads/Updated Jenkins/data"
     }
 
     stages {
@@ -61,16 +61,16 @@ pipeline {
             }
         }
 
-        stage('Verify DB Creation') {
-            steps {
-                echo "🗂 Checking if users.db is created in ${HOST_DATA_DIR}"
-                bat """
-                REM Wait 5 seconds without input redirection
-                ping 127.0.0.1 -n 6 >nul
-                if exist "${HOST_DATA_DIR}\\users.db" (echo ✅ users.db exists) else (echo ❌ users.db NOT found)
-                """
-            }
-        }
+        // stage('Verify DB Creation') {
+        //     steps {
+        //         echo "🗂 Checking if users.db is created in ${HOST_DATA_DIR}"
+        //         bat """
+        //         REM Wait 5 seconds without input redirection
+        //         ping 127.0.0.1 -n 6 >nul
+        //         if exist "${HOST_DATA_DIR}\\users.db" (echo ✅ users.db exists) else (echo ❌ users.db NOT found)
+        //         """
+        //     }
+        // }
     }
 
     post {
