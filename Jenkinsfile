@@ -1,6 +1,6 @@
 pipeline {
     agent any
-////////////////////////////
+///////////////////////////////////////////////
     environment {
         IMAGE_NAME = "login-sqlite-app"
         CONTAINER_NAME = "login-sqlite-app-container"
