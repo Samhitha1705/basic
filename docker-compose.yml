@@ -6,5 +6,5 @@ services:
     ports:
       - "5002:5002"
     volumes:
-      - ./data:/app/data
+      - C:/Users/1016/Downloads/Updated Jenkins/data:/app/data
     restart: always
